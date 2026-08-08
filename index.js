@@ -1,6 +1,21 @@
 const express = require('express');
+const helmet = require('helmet');
+const compression = require('compression');
+
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+
+// Security and performance middleware
+app.use(helmet());
+app.use(compression());
+
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'UP',
+    service: 'Siva Club',
+    timestamp: new Date().toISOString()
+  });
+});
 
 app.get('/', (req, res) => {
   res.send(`<!DOCTYPE html>
@@ -144,22 +159,22 @@ footer{
 </nav>
 
 <section class="hero">
-  <div class="card" id="gym">
+  <div class="card">
     <h2>Modern Gym</h2>
     <p>State-of-the-art equipment, strength training, cardio zones, personal trainers, and nutrition guidance inspired by Indian wellness traditions.</p>
   </div>
 
-  <div class="card" id="pool">
+  <div class="card">
     <h2>Swimming Pool</h2>
     <p>Olympic-style swimming pool with professional coaching, kids' classes, aqua fitness sessions, and relaxation lounges.</p>
   </div>
 
-  <div class="card" id="running">
+  <div class="card">
     <h2>Running Coach Sessions</h2>
     <p>Marathon preparation, endurance coaching, interval training, and personalized running plans with certified coaches.</p>
   </div>
 
-  <div class="card" id="sports">
+  <div class="card">
     <h2>Basketball Arena</h2>
     <p>Indoor wooden courts, weekend tournaments, youth coaching camps, and competitive league matches.</p>
   </div>
@@ -197,20 +212,58 @@ footer{
   </div>
 </section>
 
-<section class="membership" id="membership">
+<section class="membership">
   <h2>Become a Siva Club Member</h2>
   <p>Access the gym, swimming pool, running track, basketball and volleyball courts, yoga sessions, wellness programs, and exclusive sports events.</p>
   <a href="#" class="btn">Join Siva Club</a>
 </section>
 
 <footer>
-  <p>Siva Club • Premium Indian Sports & Wellness Experience • Hyderabad • Bengaluru • Chennai</p>
+  <p>Siva Club • Premium Indian Sports & Wellness Experience</p>
 </footer>
 
 </body>
 </html>`);
 });
 
-app.listen(PORT, () => {
-  console.log(\`Siva Club running at http://localhost:\${PORT}\`);
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'Not Found',
+    message: 'The requested resource was not found.'
+  });
 });
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({
+    error: 'Internal Server Error'
+  });
+});
+
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(\`Siva Club server started successfully on port \${PORT}\`);
+});
+
+server.on('error', (err) => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
+});
+
+const shutdown = (signal) => {
+  console.log(\`\${signal} received. Shutting down Siva Club server...\`);
+
+  server.close(() => {
+    console.log('HTTP server closed successfully');
+    process.exit(0);
+  });
+
+  setTimeout(() => {
+    console.error('Forcefully shutting down');
+    process.exit(1);
+  }, 10000);
+};
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));

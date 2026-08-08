@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  club:
+    image: polavarapusiva/siva_club:app
+    ports:
+      - "3000:3000"
+    networks:
+      - mynetwork
+    deploy:
+      replicas: 3
+
+networks:
+  mynetwork:
+    driver: overlay
