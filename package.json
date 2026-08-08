@@ -1,0 +1,12 @@
+{
+  "name": "siva-club",
+  "version": "1.0.0",
+  "description": "Siva Club - Indian themed premium sports and fitness club",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
