@@ -7,7 +7,7 @@ COPY . .
 FROM node:20-alpine
 WORKDIR /app
 COPY --from=builder /app/package.json .
-RUN npm ci --omit=dev
+RUN npm install --omit=dev
 COPY --from=builder /app/index.js ./index.js
 CMD ["npm", "start"]
 
